@@ -4,10 +4,34 @@
 #include <string>
 #include <string.h>
 #include <cctype>
+#include <cstdio>
 #include "sistema.h"
 using namespace std;
 
+#ifdef _WIN32
+    #include <io.h>
+#else
+    #include <unistd.h>
+#endif
+
 string nome_arquivo = "fichas.dat";
+
+int gerar_id()
+{
+    ifstream arq(nome_arquivo, ios::binary);
+
+    if (!arq)
+    {
+        return 0;
+    }
+
+    arq.seekg(0, ios::end);
+    int tamanho = arq.tellg();
+
+    arq.close();
+
+    return tamanho / sizeof(Ficha);
+}
 
 void to_lower_case(char *str)
 {
@@ -27,6 +51,9 @@ bool existe_arquivo(const char *nome)
 void adicionar_ficha()
 {
     Ficha f;
+
+    // Gera um ID para facilitar a manipulação dos registros
+    f.id = gerar_id();
 
     // Entrada de nome no arquivo
     cout << "Nome: ";
@@ -75,8 +102,9 @@ void listar_fichas()
 
     while (arq.read((char *)&f, sizeof(Ficha)))
     {
-        cout << "\n|---------------------------------|\n";
-        cout << "\033[36mNome: " << f.nome << "\033[0m\n"
+        cout << "\n|-------------------------------------------|\n";
+        cout << "\033[35mID: " << f.id << "\033[0m\n"
+             << "\033[36mNome: " << f.nome << "\033[0m\n"
              << " \033[31m|HP: " << f.hp << "\033[0m\n"
              << " \033[34m|MP: " << f.mp << "\033[0m\n"
              << " \033[33m|CA: " << f.ca << "\033[0m\n";
@@ -148,6 +176,68 @@ void aplicar_dano(Ficha &f, int danoBase)
     cout << "HP restante: " << f.hp << "\n";
 }
 
+void remover_ficha(const char *nome)
+{
+    fstream arq(nome_arquivo, ios::binary | ios::in | ios::out);
+
+    if (!arq)
+    {
+        cout << "\033[31mArquivo não encontrado!\033[0m\n";
+        return;
+    }
+
+    int pos = busca_ficha(nome);
+    if (pos == -1)
+    {
+        cout << "\033[31mFicha não encontrada!\033[0m\n";
+        return;
+    }
+
+    arq.seekg(0, ios::end);
+    int tamanho = arq.tellg();
+    int total = tamanho / sizeof(Ficha);
+
+    if (total == 0)
+    {
+        arq.close();
+        return;
+    }
+    else
+    {
+        // Ler até a ultima ficha
+        Ficha ultima;
+        arq.seekg((total - 1) * sizeof(Ficha));
+        arq.read((char *)&ultima, sizeof(Ficha));
+
+        ultima.id = pos;
+        // Sobrescrever posição removida
+        arq.seekp(pos * sizeof(Ficha));
+        arq.write((char *)&ultima, sizeof(Ficha));
+
+        arq.close();
+    }
+
+    cout << "\033[34mFicha excluída com sucesso\033[0m\n";
+
+    // Remove o ultimo registro
+
+    FILE *file = fopen(nome_arquivo.c_str(), "rb+");
+    if (!file)
+    {
+        cout << "\033[31mErro ao abrir arquivo para truncar!\033[0m\n";
+        return;
+    }
+    int novo_tamanho = (total - 1) * sizeof(Ficha);
+
+    #ifdef _WIN32
+        _chsize(_fileno(file), novo_tamanho);
+    #else
+        ftruncate(fileno(file), novo_tamanho);
+    #endif
+
+    fclose(file);
+}
+
 void alterar_ficha()
 {
     int dano;
@@ -177,12 +267,13 @@ void alterar_ficha()
     arq.read((char *)&f, sizeof(Ficha));
 
     int decisao;
-    cout << "\n|---------------------------------|\n";
+    cout << "\n|=================================|\n";
     cout << "O que gostaria de alterar?\n"
          << "0 -> Sair\n"
          << "1 -> Alterar o HP atual\n"
          << "2 -> Alterar o MP atual\n"
-         << "3 -> Causar dano\n";
+         << "3 -> Causar dano\n"
+         << "4 -> Excluir ficha\n";
     cin >> decisao;
 
     switch (decisao)
@@ -208,13 +299,18 @@ void alterar_ficha()
 
         if (f.hp < 20)
         {
-            cout << "\n\n\033[31mHP CRÍTICO: " << f.hp << "\033[0m\n";
+            cout << "\n\n\033[36m" << f.nome << ":\033[0m\n";
+            cout << "\033[31mHP CRÍTICO: " << f.hp << "\033[0m\n";
         }
         else
         {
+            cout << "\n\n\033[36m" << f.nome << ":\033[0m\n";
             cout << "\n\n\033[32mHP: " << f.hp << "\033[0m\n";
         }
         break;
+    case 4:
+        remover_ficha(f.nome);
+        return;
     }
     arq.seekp(pos * sizeof(Ficha));
     arq.write((char *)&f, sizeof(Ficha));

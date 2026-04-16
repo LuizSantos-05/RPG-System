@@ -3,11 +3,14 @@
 
 typedef struct ficha
 {
+    int id;
     char nome[100];
     int hp;
     int mp;
     int ca;
 } Ficha;
+
+int gerar_id();
 
 void to_lower_case(char *str);
 
@@ -24,6 +27,8 @@ int critico(int dano, int mult);
 int calcular_dano(int dano, int ca);
 
 void aplicar_dano(Ficha &f, int danoBase);
+
+void excluir_ficha();
 
 void alterar_ficha();
 

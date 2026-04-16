@@ -8,11 +8,11 @@ int main()
 
     do
     {
-        cout << "\n|---------------------------------|\n";
-        cout << "\n1 - Criar ficha\n";
-        cout << "2 - Listar fichas\n";
-        cout << "3 - Alterar ficha\n";
-        cout << "0 - Sair\n";
+        cout << "\n|=================================|\n\n";
+        cout << "1 -> Criar ficha\n";
+        cout << "2 -> Listar fichas\n";
+        cout << "3 -> Alterar ficha\n";
+        cout << "0 -> Sair\n";
         cout << ">> ";
         cin >> op;
 
