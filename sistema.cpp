@@ -136,7 +136,6 @@ int busca_ficha(const char *nome)
     return -1; // Não encontrou
 }
 
-// Multiplica o dano pelo multiplicador
 int critico(int dano, int mult)
 {
     return dano * mult;
