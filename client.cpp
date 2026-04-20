@@ -12,6 +12,7 @@ int main()
         cout << "1 -> Criar ficha\n";
         cout << "2 -> Listar fichas\n";
         cout << "3 -> Alterar ficha\n";
+        cout << "4 -> Alterar planilha\n";
         cout << "0 -> Sair\n";
         cout << ">> ";
         cin >> op;
@@ -26,6 +27,9 @@ int main()
             break;
         case 3:
             alterar_ficha();
+            break;
+        case 4:
+            alterar_planilha();
             break;
         }
 

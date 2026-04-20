@@ -16,6 +16,15 @@ using namespace std;
 
 string nome_arquivo = "fichas.dat";
 
+void alterar_planilha()
+{
+    string novaPlanilha;
+    cout << "Digite o nome da planilha que deseja acessar/criar: ";
+    cin >> novaPlanilha;
+    novaPlanilha += ".dat";
+    nome_arquivo = novaPlanilha;
+}
+
 int gerar_id()
 {
     ifstream arq(nome_arquivo, ios::binary);

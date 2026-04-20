@@ -10,6 +10,8 @@ typedef struct ficha
     int ca;
 } Ficha;
 
+void alterar_planilha();
+
 int gerar_id();
 
 void to_lower_case(char *str);
