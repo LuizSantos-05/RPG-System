@@ -21,8 +21,7 @@ void alterar_planilha()
     string novaPlanilha;
     cout << "Digite o nome da planilha que deseja acessar/criar: ";
     cin >> novaPlanilha;
-    novaPlanilha += ".dat";
-    nome_arquivo = novaPlanilha;
+    nome_arquivo = novaPlanilha + ".dat";
 }
 
 int gerar_id()
@@ -104,7 +103,7 @@ void listar_fichas()
 
     if (!arq)
     {
-        cout << "\033[31mArquivo não encontrado!\n";
+        cout << "\033[31mArquivo não encontrado!\033[0m\n";
         return;
     }
     Ficha f;
